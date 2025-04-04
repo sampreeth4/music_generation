@@ -1,5 +1,6 @@
 from tensorflow.keras import Model
-from tensorflow.keras.layers import Input, Dense, Flatten, Reshape, Conv2D, Conv2DTranspose, BatchNormalization, ReLU, Dropout
+from tensorflow.keras.layers import Input, Dense, Flatten, Reshape, Conv2D, Conv2DTranspose, BatchNormalization, ReLU, Dropout, Activation
+import numpy as np
 
 from tensorflow.keras import backend as K
 
@@ -21,12 +22,23 @@ class Autoencoder(Model):
         self._build()
     
     def summary(self):
-        return self.encoder.summary()
+        self.encoder.summary()
+        self.decoder.summary()
 
     def _build(self):
         self._build_encoder()
-        # self._build_decoder()
+        self._build_decoder()
         # self._build_autoencoder()
+
+    def _build_decoder(self):
+        decoder_input = self._add_decoder_input()
+        dense_layer = self._add_dense_layer(decoder_input)
+        reshape_layer = self._add_reshape_layer(dense_layer)
+        conv_transpose_layers = self._add_conv_transpose_layers(reshape_layer)
+        decoder_output = self._add_decoder_output(conv_transpose_layers)
+        self.decoder = Model(decoder_input, decoder_output, name="decoder")
+
+    
 
     def _build_encoder(self):
         encoder_input = self._add_encoder_input()
